@@ -73,35 +73,17 @@ sdmxConceptLookup <- function(provider = "IMF",
 
 ## 
 
+
 ##' .. content for \description{} (no empty lines) ..
 ##'
 ##' .. content for \details{} ..
-##' @title Save a list of data frames as excel file (each table in its sheet)
-##' @param l 
-##' @param file 
-##' @return NULL
+##' @title DOWNLOAD AND SAVE ALL DATA FLOWS FROM A GIVEN PROVIDER
+##' @param provider 
+##' @param folder 
+##' @return NULL 
 ##' @author Janko Cizel
-.saveExcel <- function(l,
-                       file){
-    names(l) <- gsub("[[:punct:]]+","_",names(l))
-    
-    for (x in names(l)){
-        ## IF NUMBER OF ROWS EXCEEDS 1000000, EXCEL SHEET CANNOT BE WRITTEN
-        if (nrow(l[[x]]) > 1e6){
-            write.csv(x = l[[x]],
-                      file = paste0(file,".",x,".csv"))
-        } else {
-            write.xlsx2(x = l[[x]],
-                        file = file,
-                        sheetName = x,
-                        append = TRUE)
-        }
-    }
-}
-
-## DOWNLOAD AND SAVE ALL DATA FLOWS FROM A GIVEN PROVIDER
-.getAllFlows <- function(provider = "ECB",
-                         folder = "/Users/jankocizel/Downloads"){
+sdmxGetAllFlows <- function(provider = "ECB",
+                            folder = "/Users/jankocizel/Downloads"){
     flows <-  getFlows(provider = provider)
     flowsm <- lapply(flows, function(str){
         o <- strsplit(str,split = ";")[[1]]
@@ -115,9 +97,11 @@ sdmxConceptLookup <- function(provider = "IMF",
         conc <- 
             .conceptLookups(provider = provider,
                             flow = x)
-        .saveExcel(l = conc,
-                   file = paste0(folder,"/",flowsm[[x]],".xlsx"))        
+        SDMXWrappers:::.saveExcel(l = conc,
+                                  file =
+                                      paste0(folder,"/",flowsm[[x]],".xlsx"))        
     }
+    return(NULL)
 }
 
 ## .getAllFlows(provider = "ECB")
