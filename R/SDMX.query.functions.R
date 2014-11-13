@@ -11,9 +11,9 @@
 sdmxLookupDim <- function(provider = "IMF",
                           flow = "PGI",
                           concept.dimension = "PGI_CONCEPT"){
-    cat("###           CREATING A LOOKUP TABLE           ###\n")
-    cat("PROVIDER: ",provider,"\n")
-    cat("FLOW: ",flow,"\n")
+    ## cat("###           CREATING A LOOKUP TABLE           ###\n")
+    ## cat("PROVIDER: ",provider,"\n")
+    ## cat("FLOW: ",flow,"\n")
     codes <- getCodes(provider = provider,
                       flow = flow,
                       dimension = concept.dimension)
@@ -207,9 +207,8 @@ sdmxGetAllData <- function(provider = "ECB",
         }
         
         res <- list()
-        res <- .conceptLookups(provider = provider,
-                               flow = x)
-        
+        res <- sdmxConceptLookup(provider = provider,
+                                 flow = x)
         
         d <- getDimensions(provider = provider,
                            dataflow = x)
