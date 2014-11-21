@@ -245,7 +245,7 @@ sdmxGetAllData <- function(provider = "ECB",
 
 
 sdmxGetAllDataParallel <- function(provider = "ECB",
-                                   folder = "/Users/jankocizel/Downloads",
+                                   datafolder = "./inst/extdata",
                                    flow = NULL){
     if (is.null(flow)){
         flows <-  RJSDMX:::getFlows(provider = provider)
@@ -266,15 +266,19 @@ sdmxGetAllDataParallel <- function(provider = "ECB",
         return(file %in% list.files(path = folder))
     }
 
+    if (!.fileExists(file = provider, folder = datafolder))
+        system(command = paste0('mkdir ',datafolder,'/',provider))
+
+    folder <- paste0('mkdir ',datafolder,'/',provider)
+    
     out <- 
         foreach (x = names(flowsm)) %dopar%
     {
         cat("### FLOW: ", flows[[x]],"\n")
         cat("\n")
 
-        if (.fileExists(file = paste0(flowsm[[x]],".xlsx"), folder = folder)) {
+        if (.fileExists(file = paste0(flowsm[[x]]), folder = folder)) {
             cat("File already exists!! \n")
-            stop
         }
         
         res <- list()
@@ -292,10 +296,14 @@ sdmxGetAllDataParallel <- function(provider = "ECB",
         
         res[["TS"]] <- try(SDMXWrappers:::sdmxCollectTSData(obj))
         res[["STATIC"]] <- try(SDMXWrappers:::sdmxCollectStaticData(obj))
-        
-        SDMXWrappers:::.saveExcel(l = res,
-                   file = paste0(folder,"/",flowsm[[x]],".xlsx"))
-        NULL
+
+        f <- paste0(folder,"/",flowsm[[x]])
+        for (y in names(res)){
+            write.csv(x = res[[y]],
+                      file = paste0(f,".",y,".csv"))
+        }
+
+        res[['STATIC']]
     }
 }
 
