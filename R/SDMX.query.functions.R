@@ -95,14 +95,24 @@ sdmxGetAllFlows <- function(provider = "ECB",
         paste0(o[1],".",o[2])
     })
 
-    for (x in names(flowsm)){
+    ## for (x in names(flowsm)){
+    ##     conc <- 
+    ##         sdmxConceptLookup(provider = provider,
+    ##                           flow = x)
+    ##     SDMXWrappers:::.saveExcel(l = conc,
+    ##                               file =
+    ##                                   paste0(folder,"/",flowsm[[x]],".xlsx"))        
+    ## }
+
+    out <- foreach (x = names(flowsm),
+                    .inorder = TRUE) %dopar% {
         conc <- 
-            .conceptLookups(provider = provider,
-                            flow = x)
-        SDMXWrappers:::.saveExcel(l = conc,
-                                  file =
-                                      paste0(folder,"/",flowsm[[x]],".xlsx"))        
+            SDMXWrappers:::sdmxConceptLookup(provider = provider,
+                              flow = x)
     }
+    names(out) <- names(flowsm)
+
+    
     return(NULL)
 }
 
@@ -234,3 +244,60 @@ sdmxGetAllData <- function(provider = "ECB",
 
 
 
+sdmxGetAllDataParallel <- function(provider = "ECB",
+                                   folder = "/Users/jankocizel/Downloads",
+                                   flow = NULL){
+    if (is.null(flow)){
+        flows <-  RJSDMX:::getFlows(provider = provider)
+    } else {
+        flows <- RJSDMX:::getFlows(provider = provider, pattern = flow)
+    }
+    
+    flowsm <- lapply(flows, function(str){
+        o <- strsplit(str,split = ";")[[1]]
+        o <- .trim(o)
+        o[1] <- gsub("[[:punct:]]+","_",o[1])
+        o[2] <- gsub("[[:space:]]+","_",o[2])
+        paste0(o[1],".",o[2])
+    })
+
+    ## CHECK WHETHER THE FILE ALREADY EXISTS
+    .fileExists <- function(file,folder){
+        return(file %in% list.files(path = folder))
+    }
+
+    out <- 
+        foreach (x = names(flowsm)) %dopar%
+    {
+        cat("### FLOW: ", flows[[x]],"\n")
+        cat("\n")
+
+        if (.fileExists(file = paste0(flowsm[[x]],".xlsx"), folder = folder)) {
+            cat("File already exists!! \n")
+            stop
+        }
+        
+        res <- list()
+        res <- SDMXWrappers:::sdmxConceptLookup(provider = provider,
+                                                flow = x)
+        
+        d <- RJSDMX:::getDimensions(provider = provider,
+                                    dataflow = x)
+        query <- paste(c(x,rep(".*",times = length(d))), collapse = "")
+        cat(query,"\n")
+
+        obj <-
+            try(RJSDMX:::getSDMX(provider = provider,
+                                 id = query))
+        
+        res[["TS"]] <- try(SDMXWrappers:::sdmxCollectTSData(obj))
+        res[["STATIC"]] <- try(SDMXWrappers:::sdmxCollectStaticData(obj))
+        
+        SDMXWrappers:::.saveExcel(l = res,
+                   file = paste0(folder,"/",flowsm[[x]],".xlsx"))
+        NULL
+    }
+}
+
+## sdmxGetAllDataParallel('ECB')
+## sdmxGetAllDataParallel('IMF')

@@ -1,3 +1,5 @@
+require(RJSDMX)
+
 getwd()
 load_all()
 

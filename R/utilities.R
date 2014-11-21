@@ -19,10 +19,10 @@
             write.csv(x = l[[x]],
                       file = paste0(file,".",x,".csv"))
         } else {
-            write.xlsx2(x = l[[x]],
-                        file = file,
-                        sheetName = x,
-                        append = TRUE)
+            xlsx:::write.xlsx2(x = l[[x]],
+                               file = file,
+                               sheetName = x,
+                               append = TRUE)
         }
     }
 }
