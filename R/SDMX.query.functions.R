@@ -341,14 +341,29 @@ getListOfVariables <- function(
 
     o <-
         foreach( x = .f,
-                .errorhandling = 'remove') %do% {
-            d <- fread(x)
+                .errorhandling = 'remove'
+                ) %dopar% {
+            d <- data.table:::fread(x)
+            index <- d$index
+
+            time <- 
+                lapply(index, function(ix) {
+                    o <- stringr:::str_split(ix,
+                                             pattern = ";")
+                    out <- stringr:::str_extract(o[[1]],
+                                                 pattern = "[[:digit:]]{4}")
+                    return(list(yearmin = min(as.numeric(out)),
+                                yearmax = max(as.numeric(out))))
+                })
+            
             d[, list(ID,
                      TITLE_COMPL,
                      FREQ = frequency,
                      UNIT,
                      UNIT_MULT,
-                     LENGTH = nchar(index))]
+                     LENGTH = nchar(index),
+                     YEARMIN = sapply(time,function(x) x$yearmin),
+                     YEARMAX = sapply(time,function(x) x$yearmax))]
         }
     
     out <- rbindlist(o)
@@ -384,5 +399,6 @@ queryVariableList <- function(pattern = "",
 ## queryVariableList('probability')
 ## queryVariableList('loan')
 ## queryVariableList('default')$TITLE_COMPL
-## queryVariableList('counterparty')$TITLE_COMPL
-## queryVariableList('issuance')$TITLE_COMPL
+## queryVariableList('counterparty')
+## queryVariableList('issuance')
+## queryVariableList('covered')
