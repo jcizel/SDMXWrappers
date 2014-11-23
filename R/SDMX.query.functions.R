@@ -162,7 +162,7 @@ sdmxCollectTSData <- function(o){
     for (x in names(o)){
         temp <- 
             list(ID = rep(x, times = length(o[[x]])),
-                 DATE = index(o[[x]]),
+                 DATE = zoo:::index(o[[x]]),
                  VALUE = as.numeric(o[[x]]))
         res[[x]] <- do.call(data.table, temp)
     }
@@ -245,7 +245,7 @@ sdmxGetAllData <- function(provider = "ECB",
 
 
 sdmxGetAllDataParallel <- function(provider = "ECB",
-                                   datafolder = "./inst/extdata",
+                                   datafolder = "inst/extdata",
                                    flow = NULL){
     if (is.null(flow)){
         flows <-  RJSDMX:::getFlows(provider = provider)
@@ -255,7 +255,7 @@ sdmxGetAllDataParallel <- function(provider = "ECB",
     
     flowsm <- lapply(flows, function(str){
         o <- strsplit(str,split = ";")[[1]]
-        o <- .trim(o)
+        o <- SDMXWrappers:::.trim(o)
         o[1] <- gsub("[[:punct:]]+","_",o[1])
         o[2] <- gsub("[[:space:]]+","_",o[2])
         paste0(o[1],".",o[2])
@@ -266,19 +266,32 @@ sdmxGetAllDataParallel <- function(provider = "ECB",
         return(file %in% list.files(path = folder))
     }
 
-    if (!.fileExists(file = provider, folder = datafolder))
-        system(command = paste0('mkdir ',datafolder,'/',provider))
+    folder <- paste0(datafolder,'/',provider)
+    if (!.fileExists(file = provider, folder = paste0(datafolder))){
+        system(command = paste0('mkdir ',folder))
+    }
 
-    folder <- paste0('mkdir ',datafolder,'/',provider)
     
     out <- 
-        foreach (x = names(flowsm)) %dopar%
+        foreach (x = names(flowsm),
+                 .errorhandling = 'pass') %do%
     {
+        options(java.parameters = "-Xmx8g")
         cat("### FLOW: ", flows[[x]],"\n")
         cat("\n")
 
-        if (.fileExists(file = paste0(flowsm[[x]]), folder = folder)) {
-            cat("File already exists!! \n")
+        folder2 <- paste0(datafolder,'/',provider,'/',x)
+        
+        if (!.fileExists(file = x, folder = folder)){
+            system(command = paste0('mkdir ',folder2))
+        }
+        
+        if (sum(sapply(list.files(path = folder2, full.names = TRUE), function(x) {
+            o <- file.info(x)$size/(2^20)
+            if (is.na(o)) o <- 0
+            o
+        }))>1){
+            stop("File already exists.")
         }
         
         res <- list()
@@ -290,22 +303,86 @@ sdmxGetAllDataParallel <- function(provider = "ECB",
         query <- paste(c(x,rep(".*",times = length(d))), collapse = "")
         cat(query,"\n")
 
-        obj <-
-            try(RJSDMX:::getSDMX(provider = provider,
-                                 id = query))
-        
-        res[["TS"]] <- try(SDMXWrappers:::sdmxCollectTSData(obj))
-        res[["STATIC"]] <- try(SDMXWrappers:::sdmxCollectStaticData(obj))
 
-        f <- paste0(folder,"/",flowsm[[x]])
+        obj <-
+            RJSDMX:::getSDMX(provider = provider,
+                             id = query)
+        
+        res[["TS"]] <- SDMXWrappers:::sdmxCollectTSData(obj)
+        res[["STATIC"]] <- SDMXWrappers:::sdmxCollectStaticData(obj)
+
+        f <- paste0(folder2,"/",flowsm[[x]])
         for (y in names(res)){
-            write.csv(x = res[[y]],
-                      file = paste0(f,".",y,".csv"))
+            o <- res[[y]]
+            print(str(o,1))
+            y <- gsub('[[:punct:]]+','.',y)
+            write.csv(x = o,
+                      file = paste0(f,"---",y,".csv"))
+            cat('Written to file: ', paste0(f,"---",y,".csv"),'\n')
         }
 
         res[['STATIC']]
     }
 }
 
-## sdmxGetAllDataParallel('ECB')
+## out <- sdmxGetAllDataParallel('ECB')
 ## sdmxGetAllDataParallel('IMF')
+
+
+getListOfVariables <- function(
+    provider = 'ECB',
+    outfile = paste0('inst/extdata/',provider,'-VariableList.csv')
+){
+    .f <- list.files(paste0('inst/extdata/',provider),
+                     all.files = TRUE,
+                     full.names = TRUE,
+                     recursive = TRUE,
+                     pattern = "STATIC")
+
+    o <-
+        foreach( x = .f,
+                .errorhandling = 'remove') %do% {
+            d <- fread(x)
+            d[, list(ID,
+                     TITLE_COMPL,
+                     FREQ = frequency,
+                     UNIT,
+                     UNIT_MULT,
+                     LENGTH = nchar(index))]
+        }
+    
+    out <- rbindlist(o)
+
+    out[, db := {
+        x <- stringr:::str_split(ID,
+                                 pattern = '\\.')
+        sapply(x, function(l) l[[1]])
+    }]
+
+    if (!is.null(outfile)) write.csv(out, file = outfile)
+
+    return(out)
+}
+
+## varlist <- getListOfVariables(provider = 'ECB')
+
+queryVariableList <- function(pattern = "",
+                              provider = 'ECB') {
+    .files <- list.files('./inst/extdata')
+    if (paste0(provider,'-VariableList.csv') %in% .files){
+        v <- fread(input = paste0('inst/extdata/',provider,'-VariableList.csv'))
+    } else {
+        v <- getListOfVariables(provider = 'ECB')
+    }
+
+    out <- v[toupper(TITLE_COMPL) %like% toupper(pattern)]
+
+    return(out)
+}
+
+## queryVariableList('yield')[UNIT %like% "PCPA"][FREQ==1][toupper(TITLE_COMPL) %like% "ZERO"]
+## queryVariableList('probability')
+## queryVariableList('loan')
+## queryVariableList('default')$TITLE_COMPL
+## queryVariableList('counterparty')$TITLE_COMPL
+## queryVariableList('issuance')$TITLE_COMPL

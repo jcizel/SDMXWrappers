@@ -7,14 +7,12 @@ Description: What the package does (one paragraph)
 Depends:
     R (>= 3.1.1),
     data.table,
-    RJSDMX,
     doParallel,
     foreach,
-    rlist
 Imports:
-    data.table,
     RJSDMX,
-    xlsx
+    xlsx,
+    rlist
 Suggests:
     knitr,
     testthat
