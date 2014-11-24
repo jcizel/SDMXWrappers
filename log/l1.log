@@ -24916,3 +24916,170 @@ starting worker pid=47876 on localhost:11052 at 20:48:00.988
 starting worker pid=47890 on localhost:11052 at 20:48:01.179
 starting worker pid=47902 on localhost:11052 at 20:48:01.365
 starting worker pid=47916 on localhost:11052 at 20:48:01.564
+starting worker pid=18562 on localhost:11366 at 09:34:23.673
+starting worker pid=18574 on localhost:11366 at 09:34:23.870
+starting worker pid=18586 on localhost:11366 at 09:34:24.048
+starting worker pid=18598 on localhost:11366 at 09:34:24.217
+starting worker pid=18610 on localhost:11366 at 09:34:24.386
+starting worker pid=18622 on localhost:11366 at 09:34:24.559
+starting worker pid=18634 on localhost:11366 at 09:34:24.730
+starting worker pid=18648 on localhost:11366 at 09:34:24.896
+Loading required package: SDMXWrappers
+Loading required package: SDMXWrappers
+Loading required package: data.table
+Loading required package: SDMXWrappers
+Loading required package: data.table
+Loading required package: SDMXWrappers
+Loading required package: SDMXWrappers
+Loading required package: data.table
+Loading required package: SDMXWrappers
+Loading required package: SDMXWrappers
+Loading required package: data.table
+Loading required package: data.table
+Loading required package: data.table
+Loading required package: data.table
+Loading required package: SDMXWrappers
+Loading required package: data.table
+Loading required package: RJSDMX
+Loading required package: RJSDMX
+Loading required package: RJSDMX
+Loading required package: rJava
+Loading required package: RJSDMX
+Loading required package: rJava
+Loading required package: rJava
+Loading required package: RJSDMX
+Loading required package: rJava
+Loading required package: RJSDMX
+Loading required package: RJSDMX
+Loading required package: rJava
+Loading required package: rJava
+Loading required package: rJava
+Loading required package: RJSDMX
+Loading required package: rJava
+Loading required package: zoo
+Loading required package: zoo
+Loading required package: zoo
+Loading required package: zoo
+Loading required package: zoo
+Loading required package: zoo
+Loading required package: zoo
+Loading required package: zoo
+
+Attaching package: 'zoo'
+
+
+Attaching package: 'zoo'
+
+The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
+The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
+
+Attaching package: 'zoo'
+
+
+Attaching package: 'zoo'
+
+The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
+The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
+
+Attaching package: 'zoo'
+
+The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
+
+Attaching package: 'zoo'
+
+The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
+
+Attaching package: 'zoo'
+
+The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
+
+Attaching package: 'zoo'
+
+The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
+Loading required package: doParallel
+Loading required package: doParallel
+Loading required package: foreach
+Loading required package: foreach
+Loading required package: doParallel
+Loading required package: doParallel
+Loading required package: doParallel
+Loading required package: foreach
+Loading required package: foreach
+Loading required package: doParallel
+Loading required package: doParallel
+Loading required package: foreach
+Loading required package: doParallel
+Loading required package: foreach
+Loading required package: foreach
+Loading required package: foreach
+Loading required package: iterators
+Loading required package: iterators
+Loading required package: iterators
+Loading required package: iterators
+Loading required package: iterators
+Loading required package: iterators
+Loading required package: iterators
+Loading required package: iterators
+Loading required package: parallel
+Loading required package: parallel
+Loading required package: parallel
+Loading required package: parallel
+Loading required package: parallel
+Loading required package: parallel
+Loading required package: parallel
+Loading required package: parallel
+Loading required package: rlist
+Loading required package: rlist
+Loading required package: rlist
+Loading required package: rlist
+Loading required package: rlist
+Loading required package: rlist
+Loading required package: rlist
+Loading required package: rlist
+loaded SDMXWrappers and set parent environment
+loaded SDMXWrappers and set parent environment
+loaded SDMXWrappers and set parent environment
+loaded SDMXWrappers and set parent environment
+loaded SDMXWrappers and set parent environment
+loaded SDMXWrappers and set parent environment
+loaded SDMXWrappers and set parent environment
+loaded SDMXWrappers and set parent environment
+Read 30.8% of 2431516 rowsRead 37.2% of 2040347 rowsRead 45.7% of 2431516 rowsRead 57.3% of 2040347 rowsRead 63.3% of 2431516 rowsRead 79.4% of 2040347 rowsRead 97.0% of 2040347 rowsRead 81.0% of 2431516 rowsRead 2040347 rows and 4 (of 4) columns from 0.109 GB file in 00:00:06
+Read 2431516 rows and 4 (of 4) columns from 0.160 GB file in 00:00:07
+Read 70.7% of 2092729 rowsRead 92.2% of 2092729 rowsRead 2092729 rows and 4 (of 4) columns from 0.126 GB file in 00:00:04
+Read 53.4% of 2040347 rowsRead 82.3% of 2040347 rowsRead 2040347 rows and 4 (of 4) columns from 0.122 GB file in 00:00:04
+Read 82.0% of 1536864 rowsRead 1536864 rows and 4 (of 4) columns from 0.112 GB file in 00:00:03
+Read 35.4% of 4458538 rowsRead 53.6% of 4458538 rowsRead 65.5% of 4458538 rowsRead 75.1% of 4458538 rowsRead 81.0% of 4458538 rowsRead 92.2% of 4458538 rowsRead 4458538 rows and 4 (of 4) columns from 0.268 GB file in 00:00:09
+Read 13.1% of 5658924 rowsRead 29.5% of 5658924 rowsRead 36.8% of 5658924 rowsRead 44.0% of 5658924 rowsRead 49.3% of 5658924 rowsRead 56.5% of 5658924 rowsRead 64.5% of 5658924 rowsRead 73.3% of 5658924 rowsRead 81.5% of 5658924 rowsRead 88.4% of 5658924 rowsRead 99.5% of 5658924 rowsRead 5658924 rows and 4 (of 4) columns from 0.408 GB file in 00:00:14
+loaded SDMXWrappers and set parent environment
+loaded SDMXWrappers and set parent environment
+loaded SDMXWrappers and set parent environment
+loaded SDMXWrappers and set parent environment
+loaded SDMXWrappers and set parent environment
+loaded SDMXWrappers and set parent environment
+loaded SDMXWrappers and set parent environment
+loaded SDMXWrappers and set parent environment

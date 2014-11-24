@@ -285,13 +285,17 @@ sdmxGetAllDataParallel <- function(provider = "ECB",
         if (!.fileExists(file = x, folder = folder)){
             system(command = paste0('mkdir ',folder2))
         }
-        
-        if (sum(sapply(list.files(path = folder2, full.names = TRUE), function(x) {
-            o <- file.info(x)$size/(2^20)
-            if (is.na(o)) o <- 0
-            o
-        }))>1){
-            stop("File already exists.")
+
+        flist <- list.files(path = folder2, full.names = TRUE)
+
+        if (length(flist) > 0){
+            if (sum(sapply(flist, function(x) {
+                o <- file.info(x)$size/(2^20)
+                if (is.na(o)) o <- 0
+                o
+            }))>1){
+                stop("File already exists.")
+            }
         }
         
         res <- list()
@@ -326,6 +330,7 @@ sdmxGetAllDataParallel <- function(provider = "ECB",
 }
 
 ## out <- sdmxGetAllDataParallel('ECB')
+## out <- sdmxGetAllDataParallel('IMF')
 ## sdmxGetAllDataParallel('IMF')
 
 
@@ -379,7 +384,34 @@ getListOfVariables <- function(
     return(out)
 }
 
-## varlist <- getListOfVariables(provider = 'ECB')
+
+getCoreDataset <- function(
+    provider = 'ECB',
+    outfile = paste0('inst/extdata/',provider,'-TS.csv')
+){
+    .f <- list.files(paste0('inst/extdata/',provider),
+                     all.files = TRUE,
+                     full.names = TRUE,
+                     recursive = TRUE,
+                     pattern = "TS\\.csv")
+
+    o <-
+        foreach( x = .f,
+                .errorhandling = 'remove'
+                ) %dopar% {
+            d <- data.table:::fread(x)
+            
+            d
+        }
+    
+    out <- rbindlist(o, fill = TRUE)
+
+    if (!is.null(outfile)) write.csv(out, file = outfile)
+
+    return(out)
+}
+
+## ts <- getCoreDataset(provider = 'ECB')
 
 queryVariableList <- function(pattern = "",
                               provider = 'ECB') {
@@ -402,3 +434,14 @@ queryVariableList <- function(pattern = "",
 ## queryVariableList('counterparty')
 ## queryVariableList('issuance')
 ## queryVariableList('covered')
+## queryVariableList('government')[YEARMIN<1990]
+## queryVariableList('external debt')
+## queryVariableList('supply')
+
+## varlist <- getListOfVariables('ECB')
+## varlist[grepl("ST1.Q.[A-Z]+.N.8.990.N.A1.E",ID, perl = TRUE)]
+
+## varlist[grepl("RPV.A.[A-Z]+.N.TD.00.3.AV",ID, perl = TRUE)]
+## varlist[grepl("RPP.H.[A-Z]+.N.ED.00",ID, perl = TRUE)]
+## ts[grepl("RPP.H.[A-Z]+.N.ED.00",ID, perl = TRUE)]
+
