@@ -1,4 +1,2 @@
 exportPattern("^[^\\.]")
 import('data.table')
-import('RJSDMX')
-import('xlsx')
