@@ -49,8 +49,8 @@ sdmxConceptLookup <- function(provider = "IMF",
                               flow = "PGI"){
 
     dims <- 
-        getDimensions(provider = provider,
-                      dataflow = flow)
+        RJSDMX::getDimensions(provider = provider,
+                              dataflow = flow)
 
     res <- list()
     for (x in names(dims)){
@@ -86,7 +86,7 @@ sdmxConceptLookup <- function(provider = "IMF",
 ##' @author Janko Cizel
 sdmxGetAllFlows <- function(provider = "ECB",
                             folder = "/Users/jankocizel/Downloads"){
-    flows <-  getFlows(provider = provider)
+    flows <-  RJSDMX::getFlows(provider = provider)
     flowsm <- lapply(flows, function(str){
         o <- strsplit(str,split = ";")[[1]]
         o <- .trim(o)
@@ -105,7 +105,7 @@ sdmxGetAllFlows <- function(provider = "ECB",
     ## }
 
     out <- foreach (x = names(flowsm),
-                    .inorder = TRUE) %dopar% {
+                    .inorder = TRUE) %do% {
         conc <- 
             SDMXWrappers:::sdmxConceptLookup(provider = provider,
                               flow = x)
@@ -385,44 +385,54 @@ getListOfVariables <- function(
 }
 
 
-getCoreDataset <- function(
+getLookupsFromExistingCSV <- function(
     provider = 'ECB',
+    pattern = "TS\\.csv",
+    folder = './inst/extdata',
     outfile = paste0('inst/extdata/',provider,'-TS.csv')
 ){
-    .f <- list.files(paste0('inst/extdata/',provider),
+    .f <- list.files(paste0(folder,'/',provider),
                      all.files = TRUE,
                      full.names = TRUE,
                      recursive = TRUE,
-                     pattern = "TS\\.csv")
+                     pattern = pattern)
 
     o <-
         foreach( x = .f,
                 .errorhandling = 'remove'
                 ) %dopar% {
             d <- data.table:::fread(x)
-            
+            d[, source := x]
             d
         }
     
-    out <- rbindlist(o, fill = TRUE)
+    out <- rbindlist(o, fill = TRUE)[, list(VARNAME = IDnew,
+                                            LABEL = LABEL,
+                                            SOURCE = source)]
 
     if (!is.null(outfile)) write.csv(out, file = outfile)
 
     return(out)
 }
 
+## l <- getDataFromExistingCSV(
+##     provider = 'OECD',
+##     pattern = 'LOOKUPTABLE\\.csv',
+##     outfile = './inst/extdata/OECD-VariableList.csv'
+## )
+
 ## ts <- getCoreDataset(provider = 'ECB')
 
 queryVariableList <- function(pattern = "",
-                              provider = 'ECB') {
+                              provider = 'OECD') {
     .files <- list.files('./inst/extdata')
     if (paste0(provider,'-VariableList.csv') %in% .files){
-        v <- fread(input = paste0('inst/extdata/',provider,'-VariableList.csv'))
+        v <- fread(input = sprintf('./inst/extdata/%s-VariableList.csv',provider))
     } else {
-        v <- getListOfVariables(provider = 'ECB')
+        v <- getListOfVariables(provider = provider)
     }
 
-    out <- v[toupper(TITLE_COMPL) %like% toupper(pattern)]
+    out <- v[toupper(LABEL) %like% toupper(pattern)]
 
     return(out)
 }
